@@ -90,7 +90,7 @@ function CustomPhoneField() {
   return (
     <BlockStack spacing="loose" padding={['base', 'none']}>
       <TextField
-        label="Phone number"
+        label="מספר טלפון"
         value={phoneNumber}
         onChange={(value) => {
           const digits = value.replace(/\D/g, '');
