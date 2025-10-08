@@ -15,7 +15,7 @@ export default reactExtension(
 function CustomPhoneField() {
   const { applyShippingAddressChange, shippingAddress } = useApi(); 
 
-  //. Инициализация значения из состояния API. 
+  // Инициализация значения из состояния API. 
   // Мы используем shippingAddress напрямую из useApi, чтобы избежать деприкации хука useShippingAddress.
   const initialPhone = shippingAddress?.current?.phone || '';
   
