@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   reactExtension,
   useBuyerJourneyIntercept,
@@ -21,6 +21,12 @@ function CustomPhoneField() {
   
   const [phoneNumber, setPhoneNumber] = useState(initialPhone.replace(/\D/g, '').slice(0, 10));
   const [error, setError] = useState('');
+  const isFirstApplyRef = useRef(true);
+
+  const isValidPhone = (value) => {
+    const digits = value.replace(/\D/g, '');
+    return digits.length === 10 && digits.startsWith('05');
+  };
 
   // 1. Клиентская валидация и Блокировка (useBuyerJourneyIntercept)
   useBuyerJourneyIntercept(({ canBlockProgress }) => {
@@ -45,17 +51,40 @@ function CustomPhoneField() {
     return { behavior: 'allow' };
   });
 
+  // Моментальная клиентская валидация при изменении phoneNumber
+  useEffect(() => {
+    const digits = phoneNumber.replace(/\D/g, '');
+    let currentError = '';
+
+    if (digits.length !== 0 && digits.length !== 10) {
+      currentError = 'מספר הטלפון חייב להכיל בדיוק 10 ספרות.'; // либо пустое, если хотите показывать только после blur
+    } else if (digits.length === 10 && !digits.startsWith('05')) {
+      currentError = "מספר הטלפון חייב להתחיל ב-'05'.";
+    }
+
+    setError(currentError);
+  }, [phoneNumber]);
+
   // 2. Асинхронная запись данных в поле адреса доставки
   useEffect(() => {
-    const phoneValueToSave = phoneNumber; 
+    const phoneValueToSave = phoneNumber;
+    const phoneDigits = phoneValueToSave.replace(/\D/g, '');
+
+    // Пропускаем первый рендер (чтобы не писать сразу при монтировании)
+    if (isFirstApplyRef.current) {
+      isFirstApplyRef.current = false;
+      return;
+    }
     
-    // applyShippingAddressChange — это актуальный и правильный метод для обновления данных
-    applyShippingAddressChange({
-      type: 'updateShippingAddress',
-      address: {
-        phone: phoneValueToSave 
-      }
-    });
+    // Отправляем в API только когда номер валиден по правилам (startsWith '05' и 10 цифр) или очищен
+    if (phoneDigits.length === 0 || isValidPhone(phoneValueToSave)) {
+      applyShippingAddressChange({
+        type: 'updateShippingAddress',
+        address: {
+          phone: phoneValueToSave,
+        },
+      });
+    }
   }, [phoneNumber, applyShippingAddressChange]);
 
   return (
@@ -65,76 +94,16 @@ function CustomPhoneField() {
         value={phoneNumber}
         onChange={(value) => {
           const digits = value.replace(/\D/g, '');
-          setPhoneNumber(digits.slice(0, 10)); 
-          setError('');
+          setPhoneNumber(digits.slice(0, 10))
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.preventDefault();
         }}
         error={error}
         type="tel" 
-        maxLength={10} 
+        maxLength={10}
         required
       />
     </BlockStack>
   );
 }
-
-
-
-
-
-// import React, { useState, useEffect } from 'react';
-// import {
-//   reactExtension,
-//   Banner,
-//   BlockStack,
-//   useBuyerJourneyIntercept,
-//   useShippingAddress,
-//   TextField,
-//   Text,
-//   useApi,
-//   Checkbox,
-//   useApplyAttributeChange,
-//   useInstructions,
-//   useTranslate,
-// } from "@shopify/ui-extensions-react/checkout";
-
-// // 1. Choose an extension target
-// export default reactExtension(
-//   'purchase.checkout.delivery-address.render-after',
-//   () => <Extension />,
-// );
-
-// function Extension() {
-//   const applyAttributeChange =
-//     useApplyAttributeChange();
-//   const instructions = useInstructions();
-
-//   // 2. Render a UI
-//   return (
-//     <Checkbox onChange={onCheckboxChange}>
-//       I would like to receive a free gift with my
-//       order
-//     </Checkbox>
-//   );
-
-//   async function onCheckboxChange(isChecked) {
-//     // 3. Check if the API is available
-//     if (
-//       !instructions.attributes.canUpdateAttributes
-//     ) {
-//       console.error(
-//         'Attributes cannot be updated in this checkout',
-//       );
-//       return;
-//     }
-//     // 4. Call the API to modify checkout
-//     const result = await applyAttributeChange({
-//       key: 'requestedFreeGift',
-//       type: 'updateAttribute',
-//       value: isChecked ? 'yes' : 'no',
-//     });
-//     console.log(
-//       'applyAttributeChange result',
-//       result,
-//     );
-//   }
-// }
