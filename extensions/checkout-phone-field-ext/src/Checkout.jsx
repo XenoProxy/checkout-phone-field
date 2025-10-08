@@ -15,11 +15,10 @@ export default reactExtension(
 );
 
 function CustomPhoneField() {
-  // Хук для доступа к функциям API
   const { applyShippingAddressChange, shippingAddress } = useApi(); 
 
-  // // Инициализация значения из состояния API. 
-  // // Мы используем shippingAddress напрямую из useApi, чтобы избежать деприкации хука useShippingAddress.
+  //. Инициализация значения из состояния API. 
+  // Мы используем shippingAddress напрямую из useApi, чтобы избежать деприкации хука useShippingAddress.
   const initialPhone = shippingAddress?.current?.phone || '';
   
   const [phoneNumber, setPhoneNumber] = useState(initialPhone.replace(/\D/g, '').slice(0, 10));
@@ -51,7 +50,7 @@ function CustomPhoneField() {
   // 2. Асинхронная запись данных в поле адреса доставки
   useEffect(() => {
     const phoneValueToSave = phoneNumber; 
-
+    
     // applyShippingAddressChange — это актуальный и правильный метод для обновления данных
     applyShippingAddressChange({
       type: 'updateShippingAddress',
@@ -74,7 +73,6 @@ function CustomPhoneField() {
         label="Номер телефона"
         value={phoneNumber}
         onChange={(value) => {
-          // Очистка и ограничение ввода
           const digits = value.replace(/\D/g, '');
           setPhoneNumber(digits.slice(0, 10)); 
           setError('');
