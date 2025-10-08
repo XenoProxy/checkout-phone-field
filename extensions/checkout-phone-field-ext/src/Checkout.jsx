@@ -5,10 +5,8 @@ import {
   useApi,
   TextField,
   BlockStack,
-  Banner,
 } from '@shopify/ui-extensions-react/checkout';
 
-// *** ТОЧКА РАСШИРЕНИЯ (Target) ***
 export default reactExtension(
   'purchase.checkout.delivery-address.render-after', 
   () => <CustomPhoneField />
@@ -30,9 +28,9 @@ function CustomPhoneField() {
     let currentError = '';
 
     if (phoneDigits.length !== 10) {
-      currentError = 'Номер телефона должен содержать ровно 10 цифр.';
+      currentError = 'מספר הטלפון חייב להכיל בדיוק 10 ספרות.';
     } else if (!phoneDigits.startsWith('05')) {
-      currentError = "Номер телефона должен начинаться с '05'.";
+      currentError = "מספר הטלפון חייב להתחיל ב-'05'.";
     }
 
     setError(currentError);
@@ -40,7 +38,7 @@ function CustomPhoneField() {
     if (canBlockProgress && currentError) {
       return {
         behavior: 'block',
-        reason: 'Требуется исправить формат телефонного номера.',
+        reason: 'יש לתקן את פורמט מספר הטלפון.',
         perform: () => {},
       };
     }
@@ -55,22 +53,15 @@ function CustomPhoneField() {
     applyShippingAddressChange({
       type: 'updateShippingAddress',
       address: {
-        // Записываем наш 10-значный номер в поле phone
         phone: phoneValueToSave 
       }
     });
   }, [phoneNumber, applyShippingAddressChange]);
 
-  // 3. Рендеринг кастомного поля
   return (
     <BlockStack spacing="loose" padding={['base', 'none']}>
-      <Banner status="info">
-        Введите 10-значный номер телефона, начиная с 05. Код страны не требуется.
-      </Banner>
-      
-      {/* Используем TextField для отключения UI кодов стран */}
       <TextField
-        label="Номер телефона"
+        label="Phone number"
         value={phoneNumber}
         onChange={(value) => {
           const digits = value.replace(/\D/g, '');
