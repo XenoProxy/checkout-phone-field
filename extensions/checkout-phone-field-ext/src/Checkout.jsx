@@ -8,7 +8,7 @@ import {
 } from '@shopify/ui-extensions-react/checkout';
 
 export default reactExtension(
-  'purchase.checkout.delivery-address.render-after', 
+  'purchase.checkout.delivery-address.render-before', 
   () => <CustomPhoneField />
 );
 
