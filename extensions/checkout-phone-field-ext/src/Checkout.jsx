@@ -33,18 +33,27 @@ function CustomPhoneField() {
     const phoneDigits = phoneNumber.replace(/\D/g, '');
     let currentError = '';
 
-    if (phoneDigits.length !== 10) {
+    if (!phoneDigits) {
+      console.log('Phone is required');
+      currentError = "אנא הזן מספר טלפון.";
+    }
+    else if (phoneDigits.length !== 10) {
       currentError = 'מספר הטלפון חייב להכיל בדיוק 10 ספרות.';
     } else if (!phoneDigits.startsWith('05')) {
       currentError = "מספר הטלפון חייב להתחיל ב-'05'.";
-    }
+    }   
 
-    setError(currentError);
+    setError(currentError);   
 
     if (canBlockProgress && currentError) {
       return {
         behavior: 'block',
         reason: 'יש לתקן את פורמט מספר הטלפון.',
+        errors: [
+          {
+            target: "$.cart.deliveryGroups[0].deliveryAddress.phone",
+          },
+        ],
         perform: () => {},
       };
     }
@@ -71,10 +80,10 @@ function CustomPhoneField() {
     const phoneDigits = phoneValueToSave.replace(/\D/g, '');
 
     // Пропускаем первый рендер (чтобы не писать сразу при монтировании)
-    if (isFirstApplyRef.current) {
-      isFirstApplyRef.current = false;
-      return;
-    }
+    // if (isFirstApplyRef.current) {
+    //   isFirstApplyRef.current = false;
+    //   return;
+    // }
     
     // Отправляем в API только когда номер валиден по правилам (startsWith '05' и 10 цифр) или очищен
     if (phoneDigits.length === 0 || isValidPhone(phoneValueToSave)) {
