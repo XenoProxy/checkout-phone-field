@@ -78,12 +78,6 @@ function CustomPhoneField() {
   useEffect(() => {
     const phoneValueToSave = phoneNumber;
     const phoneDigits = phoneValueToSave.replace(/\D/g, '');
-
-    // Пропускаем первый рендер (чтобы не писать сразу при монтировании)
-    // if (isFirstApplyRef.current) {
-    //   isFirstApplyRef.current = false;
-    //   return;
-    // }
     
     // Отправляем в API только когда номер валиден по правилам (startsWith '05' и 10 цифр) или очищен
     if (phoneDigits.length === 0 || isValidPhone(phoneValueToSave)) {
